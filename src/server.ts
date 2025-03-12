@@ -17,7 +17,6 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api", helloMiddleware, snippetRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.all("*", notFound);
 
