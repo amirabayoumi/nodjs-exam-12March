@@ -1,71 +1,119 @@
-# Node, Express and TypeScript Project Template
+# Snippet Management System
 
-Welcome to the **Node, Express and TypeScript Project Template**! This repository serves as a starter template for building Node.js applications with TypeScript. It comes pre-configured with models, controllers, routes, and bundling, so you can focus on building your application.
+## Project Overview
+- This project is a snippet management system that allows users to:
+  - Manage code snippets
+  - Filter snippets by language and tags
+  - View snippets in a user-friendly dashboard
+- **Backend**: Built using Node.js, Express, and MongoDB
+- **Frontend**: Served with EJS templates and HTML
 
-## Features
+## Features:
+1. API for managing snippets (create, read, update, delete).
+2. Filters to search snippets by language and tags.
+3. A dashboard to view snippets in an organized table format.
+4. Option to dynamically filter snippets on the dashboard.
 
-- **TypeScript**: Strongly typed language for writing robust and maintainable code.
-- **Project Structure**: Organized folder structure with models, controllers, and routes.
-- **Bundling pkgroll**: Pre-configured with a bundler for efficient builds.
-- **TSX**: For automatic server restarts an running typescript during development.
-- **Dependency Management**: Configured with npm.
+## API Documentation
 
-## Project Structure
+### 1. GET /api/snippets
+- **Fetches** all snippets with optional filters applied.
 
-```
-├── src
-│   ├── controllers
-│   │   └── exampleController.ts
-│   ├── middleware
-│   │   └── exampleMiddleware.ts
-│   ├── models
-│   │   └── exampleModel.ts
-│   ├── routes
-│   │   └── exampleRoutes.ts
-│   └── server.ts    // Main entry point of the application
-├── dist             // Compiled output (auto-generated)
-├── package.json     // Project dependencies and scripts
-├──.gitignore        // Ignore files to github
-├── tsconfig.json    // TypeScript configuration
-└── README.md        // Project documentation
-```
+#### Query Parameters:
+- `language`: Filter by programming language (e.g., "javascript", "python").
+- `tags`: Filter by tags (comma-separated values, e.g., "async,fetch").
+- `page`: The page number for pagination.
+- `limit`: The number of snippets to return per page.
+- `sort`: Field to sort by (e.g., "createdAt").
+- `order`: Sorting order (either "asc" or "desc").
 
-## Getting Started
+#### Response:
+- **200 OK**: Returns a list of snippets that match the query parameters.
+- **400 Bad Request**: If there's an issue with the query or validation errors.
 
-### 1. Start Development Server
+### 2. POST /api/snippets
+- **Adds** a new snippet.
 
-Run the development server with hot-reloading:
+#### Request Body:
+- `title`: The title of the snippet.
+- `code`: The code snippet itself.
+- `normal`: The programming language of the snippet.
+- `tags`: The tags associated with the snippet.
 
-```bash
-npm run dev
-```
+#### Response:
+- **201 Created**: Returns the created snippet object.
+- **400 Bad Request**: If the data does not pass validation.
 
-### 2. Build the Project
+### 3. GET /api/snippets/:id
+- **Fetches** a snippet by its ID.
 
-Compile TypeScript files to JavaScript:
+#### Parameters:
+- `id`: The unique identifier of the snippet.
 
-```bash
-npm run build
-```
+#### Response:
+- **200 OK**: Returns the snippet data.
+- **404 Not Found**: If the snippet with the given ID does not exist.
 
-### 3. Start the Production Server
+### 4. DELETE /api/snippets/:id
+- **Deletes** a snippet by its ID.
 
-After building the project, start the server:
+#### Parameters:
+- `id`: The unique identifier of the snippet.
 
-```bash
-npm start
-```
+#### Response:
+- **200 OK**: Returns a success message.
+- **404 Not Found**: If the snippet with the given ID does not exist.
 
-## Scripts
+### 5. PUT /api/snippets/:id
+- **Updates** a snippet by its ID.
 
-- `dev`: Starts the development server with hot-reloading.
-- `build`: Compiles the TypeScript source code to JavaScript.
-- `start`: Starts the production server.
+#### Parameters:
+- `id`: The unique identifier of the snippet.
 
-## License
+#### Request Body:
+- `title`: The updated title of the snippet.
+- `code`: The updated code snippet.
+- `normal`: The updated programming language of the snippet.
+- `tags`: The updated tags associated with the snippet.
 
-This project is licensed under the [MIT License](LICENSE).
+#### Response:
+- **200 OK**: Returns the updated snippet data.
+- **404 Not Found**: If the snippet with the given ID does not exist.
 
----
+## Dashboard Explanation
+- The Dashboard is a frontend page rendered using EJS. It displays all snippets in a table format with the following columns:
+  - **Title**: The name of the snippet.
+  - **Code**: The code snippet itself.
+  - **Language**: The programming language of the snippet.
+  - **Tags**: The tags associated with the snippet.
 
-Happy coding! 🎉
+### Filtering
+1. **Language Filter**:
+   - Allows you to filter the snippets by programming language.
+   - The available options are dynamically loaded from the existing snippets in the database.
+   
+2. **Tags Filter**:
+   - Allows you to filter snippets by tags.
+   - Tags are loaded dynamically from the available snippets.
+
+### Functionality
+1. The filters allow users to narrow down the displayed snippets based on their selected language or tags.
+2. The table updates dynamically to show the filtered results when the user changes any filter.
+3. Pagination is handled by the API, so only a specific number of snippets are displayed at a time. The user can scroll through multiple pages of snippets.
+
+## Frontend and Backend Integration
+
+### Frontend (EJS Template)
+- The frontend interacts with the backend through AJAX requests using the Fetch API.
+- The selected filters (language and tags) are sent as query parameters in the request to the API.
+- When the API returns the filtered data, the table is updated dynamically to show the results.
+
+### Backend (Express and MongoDB)
+- The backend handles API requests to get snippets, create new snippets, delete, and update them.
+- Filters are applied to the database queries using MongoDB's query operators (`$regex`, `$all`, etc.).
+- Pagination and sorting are also handled by MongoDB’s built-in methods like `skip()`, `limit()`, and `sort()`.
+
+## Live Demo
+You can check the live demo of the Snippet Management System at the following link:
+
+[Live Demo](https://nodjs-exam-12march.onrender.com/)
