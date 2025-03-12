@@ -1,46 +1,63 @@
 import { Request, Response } from "express";
 import { Error as MongooseError } from "mongoose";
 const { ValidationError } = MongooseError;
-import { Snippet
+import { Snippet } from "../models/SnippetModel";
 
- } from "../models/SnippetModel";
-
-
- export const getAllSnippet = async (req: Request, res: Response) => {
+export const getAllSnippet = async (req: Request, res: Response) => {
   try {
-    const { language, tags, page = 1, limit = 10, sort = "createdAt", order = "desc" } = req.query;
+    const { page = 1, limit = 10, sort = "createdAt", order = "desc" } = req.query;
+    const { language } = req.query;
+    const { tags } = req.query;
 
-  
-    let filter: any = {};
+    // If filtering by language only
     if (language) {
-      filter.language = { $regex: new RegExp(language as string, "i") }; 
+      const filteredSnippets = await Snippet.find({ 
+        language: { $regex: language as string, $options: "i" }
+      });
+      return res.status(200).json({ message: "Filtered by language", snippets: filteredSnippets });
     }
+
+    // If filtering by tags only
     if (tags) {
       const tagArray = (tags as string).split(",");
-      filter.tags = { $all: tagArray.map(tag => new RegExp(tag, "i")) }; 
+      const filteredSnippets = await Snippet.find({ 
+        tags: { $all: tagArray.map(tag => new RegExp(tag, "i")) }
+      });
+      return res.status(200).json({ message: "Filtered by tags", snippets: filteredSnippets });
     }
 
+    // If no filters were provided, return all snippets with pagination and sorting
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
 
-    const options = {
-      skip: (Number(page) - 1) * Number(limit),
-      limit: Number(limit),
-      sort: [[sort as string, order === "asc" ? "asc" : "desc"]],
-    };
+    // Sorting options
+    const sortOptions: any = {};
+    sortOptions[sort as string] = order === "asc" ? 1 : -1;
 
- 
-    const snippets = await Snippet.find(filter).skip(options.skip).limit(options.limit).sort(options.sort as any);
+    // Fetch all snippets with pagination & sorting
+    const snippets = await Snippet.find({})
+      .skip(skip)
+      .limit(limitNumber)
+      .sort(sortOptions);
 
- 
-    const total = await Snippet.countDocuments(filter);
+    // Get total count of all snippets
+    const total = await Snippet.countDocuments({});
 
-    res.json({ total, page: Number(page), limit: Number(limit), snippets });
+    // Send response
+    res.status(200).json({
+      message: "Fetched all snippets",
+      total,
+      page: pageNumber,
+      limit: limitNumber,
+      snippets,
+    });
+
   } catch (error) {
     if (error instanceof ValidationError) {
-        res.status(400).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     } else {
-        res.status(500).json({ message: "something went wrong", error });
+      res.status(500).json({ message: "Something went wrong", error });
     }
-}
+  }
 };
-
-
