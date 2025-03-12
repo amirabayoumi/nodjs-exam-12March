@@ -63,8 +63,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  async function populateFilters() {
+    try {
+      const response = await fetch("/api/snippets");
+      const data = await response.json();
+
+      if (response.ok) {
+        // Populate language filter
+        const uniqueLanguages = [
+          ...new Set(data.snippets.map((snippet) => snippet.language)),
+        ];
+
+        uniqueLanguages.forEach((language) => {
+          const option = document.createElement("option");
+          option.value = language;
+          option.textContent = language;
+          languageFilter.appendChild(option);
+        });
+
+        // Populate tags filter
+        const allTags = data.snippets.flatMap((snippet) => snippet.tags);
+        const uniqueTags = [...new Set(allTags)];
+
+        uniqueTags.forEach((tag) => {
+          const option = document.createElement("option");
+          option.value = tag;
+          option.textContent = tag;
+          tagsFilter.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching filters:", error);
+    }
+  }
+
+  // Add the "No Filter" option for both language and tags filters
+  const noFilterLanguageOption = document.createElement("option");
+  noFilterLanguageOption.value = "all";
+  noFilterLanguageOption.textContent = "No Filter";
+  languageFilter.appendChild(noFilterLanguageOption);
+
+  const noFilterTagsOption = document.createElement("option");
+  noFilterTagsOption.value = "all";
+  noFilterTagsOption.textContent = "No Filter";
+  tagsFilter.appendChild(noFilterTagsOption);
+
   languageFilter.addEventListener("change", fetchFilteredSnippets);
   tagsFilter.addEventListener("change", fetchFilteredSnippets);
 
+  populateFilters();
   fetchFilteredSnippets();
 });
