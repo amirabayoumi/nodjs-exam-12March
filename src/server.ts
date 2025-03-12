@@ -7,9 +7,10 @@ import testRoutes from "./routes/exampleRoutes";
 import { helloMiddleware } from "./middleware/exampleMiddleware";
 import mongoose from "mongoose";
 
+import snippetRoutes from "./routes/snippetsRoutes";
 // Variables
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5001
 
 // Middleware
 app.use(cors());
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api", helloMiddleware, testRoutes);
+app.use("/api/snippets", snippetRoutes);
 app.all("*", notFound);
 
 // Database connection
