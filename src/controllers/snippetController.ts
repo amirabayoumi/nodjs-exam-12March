@@ -61,3 +61,20 @@ export const getAllSnippet = async (req: Request, res: Response) => {
     }
   }
 };
+
+
+export const addNewSnippets = async (req: Request, res: Response) => {
+  try {
+    const { title, code, language, tags, expiresIn } = req.body;
+    const snippet = await Snippet.create({ title, code, language, tags, expiresIn });    
+    res.status(201).json({ message: "Snippet added successfully", snippet }); 
+  }catch (error) {
+    if (error instanceof ValidationError) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "Something went wrong", error });
+    }
+  }}
+
+
+ 

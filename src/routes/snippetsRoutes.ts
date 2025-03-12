@@ -1,11 +1,11 @@
 import express from "express";
 
-import { getAllSnippet} from "../controllers/snippetController";
+import { getAllSnippet, addNewSnippets} from "../controllers/snippetController";
 
 
 const router = express.Router();
 
 router
-.get("/", getAllSnippet);
+.get("/", getAllSnippet).post("/", addNewSnippets);
 
 export default router;
